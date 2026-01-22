@@ -1,0 +1,16 @@
+{
+  "name": "awesome-skills",
+  "version": "1.0.0",
+  "description": "Awesome Claude Code Skills Collection",
+  "author": "oklaM",
+  "repository": "https://github.com/oklaM/awesome-skills",
+  "license": "MIT",
+  "skills": [
+    {
+      "name": "example-skill",
+      "path": "skills/example-skill",
+      "description": "An example skill to demonstrate the structure",
+      "category": "development"
+    }
+  ]
+}

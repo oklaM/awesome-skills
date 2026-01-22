@@ -1,0 +1,26 @@
+{
+  "name": "awesome-skills-marketplace",
+  "version": "1.0.0",
+  "description": "Awesome Claude Code Skills Collection - A curated set of skills for Claude Code",
+  "repository": "https://github.com/oklaM/awesome-skills",
+  "plugins": [
+    {
+      "name": "example-skill",
+      "source": "skills/example-skill",
+      "description": "An example skill demonstrating the standard structure for Claude Code skills",
+      "category": "development",
+      "version": "1.0.0",
+      "skills": ["example-skill"],
+      "tags": ["example", "template", "development"]
+    }
+  ],
+  "categories": [
+    "development",
+    "productivity",
+    "documentation",
+    "testing",
+    "devops",
+    "data",
+    "security"
+  ]
+}

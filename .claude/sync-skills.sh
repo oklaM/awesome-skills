@@ -1,0 +1,163 @@
+#!/bin/bash
+# Sync skills to plugin.json and marketplace.json
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+PLUGIN_JSON="$PROJECT_ROOT/.claude-plugin/plugin.json"
+MARKETPLACE_JSON="$PROJECT_ROOT/.claude-plugin/marketplace.json"
+SKILLS_DIR="$PROJECT_ROOT/skills"
+
+# Array to store skill entries
+declare -a SKILL_ENTRIES
+
+# Find all skill directories
+for skill_dir in "$SKILLS_DIR"/*/; do
+  if [[ -d "$skill_dir" ]]; then
+    skill_name=$(basename "$skill_dir")
+    skill_md="$skill_dir/SKILL.md"
+
+    # Skip if no SKILL.md
+    if [[ ! -f "$skill_md" ]]; then
+      continue
+    fi
+
+    # Parse YAML frontmatter
+    in_frontmatter=false
+    description=""
+    category=""
+
+    while IFS= read -r line; do
+      if [[ "$line" == "---" ]]; then
+        if [[ "$in_frontmatter" == false ]]; then
+          in_frontmatter=true
+          continue
+        else
+          break
+        fi
+      fi
+
+      if [[ "$in_frontmatter" == true ]]; then
+        if [[ "$line" =~ ^description:[[:space:]]+(.+)$ ]]; then
+          description="${BASH_REMATCH[1]}"
+          # Remove quotes if present
+          description="${description%\"}"
+          description="${description#\"}"
+        elif [[ "$line" =~ ^category:[[:space:]]+(.+)$ ]]; then
+          category="${BASH_REMATCH[1]}"
+        fi
+      fi
+    done < "$skill_md"
+
+    # Default category if not found
+    if [[ -z "$category" ]]; then
+      category="development"
+    fi
+
+    # Default description if not found
+    if [[ -z "$description" ]]; then
+      description="$skill_name skill"
+    fi
+
+    # Add to array
+    SKILL_ENTRIES+=("$skill_name|$description|$category")
+  fi
+done
+
+# Generate plugin.json
+{
+  cat << 'EOF'
+{
+  "name": "awesome-skills",
+  "version": "1.0.0",
+  "description": "Awesome Claude Code Skills Collection",
+  "author": "oklaM",
+  "repository": "https://github.com/oklaM/awesome-skills",
+  "license": "MIT",
+  "skills": [
+EOF
+
+  first=true
+  for entry in "${SKILL_ENTRIES[@]}"; do
+    IFS='|' read -r name desc category <<< "$entry"
+
+    if [[ "$first" = true ]]; then
+      first=false
+    else
+      echo ","
+    fi
+
+    printf '    {\n'
+    printf '      "name": "%s",\n' "$name"
+    printf '      "path": "skills/%s",\n' "$name"
+    printf '      "description": "%s",\n' "$desc"
+    printf '      "category": "%s"\n' "$category"
+    printf '    }'
+  done
+
+  echo ""
+  echo "  ]"
+  echo "}"
+} > "$PLUGIN_JSON"
+
+# Generate marketplace.json
+{
+  cat << 'EOF'
+{
+  "name": "awesome-skills-marketplace",
+  "version": "1.0.0",
+  "description": "Awesome Claude Code Skills Collection - A curated set of skills for Claude Code",
+  "repository": "https://github.com/oklaM/awesome-skills",
+  "plugins": [
+EOF
+
+  first=true
+  for entry in "${SKILL_ENTRIES[@]}"; do
+    IFS='|' read -r name desc category <<< "$entry"
+
+    # Generate tags from name and category
+    tags="\"$category\""
+    if [[ "$name" =~ [a-z]+-[a-z]+ ]]; then
+      IFS='-' read -ra parts <<< "$name"
+      for part in "${parts[@]}"; do
+        tags="$tags, \"$part\""
+      done
+    fi
+
+    if [[ "$first" = true ]]; then
+      first=false
+    else
+      echo ","
+    fi
+
+    printf '    {\n'
+    printf '      "name": "%s",\n' "$name"
+    printf '      "source": "skills/%s",\n' "$name"
+    printf '      "description": "%s",\n' "$desc"
+    printf '      "category": "%s",\n' "$category"
+    printf '      "version": "1.0.0",\n'
+    printf '      "skills": ["%s"],\n' "$name"
+    printf '      "tags": [%s]\n' "$tags"
+    printf '    }'
+  done
+
+  echo ""
+  echo "  ],"
+  echo "  \"categories\": ["
+  echo "    \"development\","
+  echo "    \"productivity\","
+  echo "    \"documentation\","
+  echo "    \"testing\","
+  echo "    \"devops\","
+  echo "    \"data\","
+  echo "    \"security\""
+  echo "  ]"
+  echo "}"
+} > "$MARKETPLACE_JSON"
+
+echo "✓ Synced ${#SKILL_ENTRIES[@]} skills to plugin.json and marketplace.json"
+
+# Add the files to staging if they changed
+git add "$PLUGIN_JSON" "$MARKETPLACE_JSON" 2>/dev/null || true

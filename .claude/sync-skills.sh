@@ -106,8 +106,12 @@ EOF
 {
   cat << 'EOF'
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "awesome-skills-marketplace",
-  "owner": "oklaM",
+  "owner": {
+    "name": "oklaM",
+    "email": "users@noreply.github.com"
+  },
   "version": "1.0.0",
   "description": "Awesome Claude Code Skills Collection - A curated set of skills for Claude Code",
   "repository": "https://github.com/oklaM/awesome-skills",
@@ -118,15 +122,6 @@ EOF
   for entry in "${SKILL_ENTRIES[@]}"; do
     IFS='|' read -r name desc category <<< "$entry"
 
-    # Generate tags from name and category
-    tags="\"$category\""
-    if [[ "$name" =~ [a-z]+-[a-z]+ ]]; then
-      IFS='-' read -ra parts <<< "$name"
-      for part in "${parts[@]}"; do
-        tags="$tags, \"$part\""
-      done
-    fi
-
     if [[ "$first" = true ]]; then
       first=false
     else
@@ -135,25 +130,13 @@ EOF
 
     printf '    {\n'
     printf '      "name": "%s",\n' "$name"
-    printf '      "source": "./skills/%s",\n' "$name"
     printf '      "description": "%s",\n' "$desc"
-    printf '      "category": "%s",\n' "$category"
-    printf '      "version": "1.0.0",\n'
-    printf '      "skills": ["./%s"],\n' "$name"
-    printf '      "tags": [%s]\n' "$tags"
+    printf '      "source": "./skills/%s",\n' "$name"
+    printf '      "category": "%s"\n' "$category"
     printf '    }'
   done
 
   echo ""
-  echo "  ],"
-  echo "  \"categories\": ["
-  echo "    \"development\","
-  echo "    \"productivity\","
-  echo "    \"documentation\","
-  echo "    \"testing\","
-  echo "    \"devops\","
-  echo "    \"data\","
-  echo "    \"security\""
   echo "  ]"
   echo "}"
 } > "$MARKETPLACE_JSON"

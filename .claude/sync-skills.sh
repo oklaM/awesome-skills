@@ -106,16 +106,22 @@ EOF
 {
   cat << 'EOF'
 {
-  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "awesome-skills-marketplace",
+  "name": "awesome-skills",
   "owner": {
     "name": "oklaM",
     "email": "users@noreply.github.com"
   },
-  "version": "1.0.0",
-  "description": "Awesome Claude Code Skills Collection - A curated set of skills for Claude Code",
-  "repository": "https://github.com/oklaM/awesome-skills",
+  "metadata": {
+    "description": "Awesome Claude Code Skills Collection",
+    "version": "1.0.0"
+  },
   "plugins": [
+    {
+      "name": "awesome-skills-collection",
+      "description": "Collection of useful skills for Claude Code including TDD expert and example templates",
+      "source": "./",
+      "strict": false,
+      "skills": [
 EOF
 
   first=true
@@ -128,15 +134,12 @@ EOF
       echo ","
     fi
 
-    printf '    {\n'
-    printf '      "name": "%s",\n' "$name"
-    printf '      "description": "%s",\n' "$desc"
-    printf '      "source": "./skills/%s",\n' "$name"
-    printf '      "category": "%s"\n' "$category"
-    printf '    }'
+    printf '        "./skills/%s"' "$name"
   done
 
   echo ""
+  echo "      ]"
+  echo "    }"
   echo "  ]"
   echo "}"
 } > "$MARKETPLACE_JSON"

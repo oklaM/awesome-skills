@@ -107,6 +107,7 @@ EOF
   cat << 'EOF'
 {
   "name": "awesome-skills-marketplace",
+  "owner": "oklaM",
   "version": "1.0.0",
   "description": "Awesome Claude Code Skills Collection - A curated set of skills for Claude Code",
   "repository": "https://github.com/oklaM/awesome-skills",
@@ -134,11 +135,11 @@ EOF
 
     printf '    {\n'
     printf '      "name": "%s",\n' "$name"
-    printf '      "source": "skills/%s",\n' "$name"
+    printf '      "source": "./skills/%s",\n' "$name"
     printf '      "description": "%s",\n' "$desc"
     printf '      "category": "%s",\n' "$category"
     printf '      "version": "1.0.0",\n'
-    printf '      "skills": ["%s"],\n' "$name"
+    printf '      "skills": ["./%s"],\n' "$name"
     printf '      "tags": [%s]\n' "$tags"
     printf '    }'
   done

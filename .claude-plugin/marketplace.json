@@ -1,25 +1,26 @@
 {
   "name": "awesome-skills-marketplace",
+  "owner": "oklaM",
   "version": "1.0.0",
   "description": "Awesome Claude Code Skills Collection - A curated set of skills for Claude Code",
   "repository": "https://github.com/oklaM/awesome-skills",
   "plugins": [
     {
       "name": "example-skill",
-      "source": "skills/example-skill",
+      "source": "./skills/example-skill",
       "description": "当需要演示技能结构或创建新技能模板时使用此技能",
       "category": "development",
       "version": "1.0.0",
-      "skills": ["example-skill"],
+      "skills": ["./example-skill"],
       "tags": ["development", "example", "skill"]
     },
     {
       "name": "tdd-expert",
-      "source": "skills/tdd-expert",
+      "source": "./skills/tdd-expert",
       "description": "TDD (Test-Driven Development) expert that guides through the red-green-refactor cycle. Use when: (1) Starting from scratch to implement new features with TDD methodology, (2) Adding tests to existing code bases to improve coverage and quality, (3) Reviewing and improving test quality and TDD practices. Supports Python (pytest, unittest), JavaScript/TypeScript (Jest, Vitest, Mocha), and Java (JUnit, TestNG) with expert-level guidance on test design principles, mocking, refactoring, and best practices.",
       "category": "development",
       "version": "1.0.0",
-      "skills": ["tdd-expert"],
+      "skills": ["./tdd-expert"],
       "tags": ["development", "tdd", "expert"]
     }
   ],

@@ -1,12 +1,11 @@
 #!/bin/bash
-# Sync skills to plugin.json and marketplace.json
+# Sync skills to marketplace.json
 
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-PLUGIN_JSON="$PROJECT_ROOT/.claude-plugin/plugin.json"
 MARKETPLACE_JSON="$PROJECT_ROOT/.claude-plugin/marketplace.json"
 SKILLS_DIR="$PROJECT_ROOT/skills"
 
@@ -66,42 +65,6 @@ for skill_dir in "$SKILLS_DIR"/*/; do
   fi
 done
 
-# Generate plugin.json
-{
-  cat << 'EOF'
-{
-  "name": "awesome-skills",
-  "version": "1.0.0",
-  "description": "Awesome Claude Code Skills Collection",
-  "author": "oklaM",
-  "repository": "https://github.com/oklaM/awesome-skills",
-  "license": "MIT",
-  "skills": [
-EOF
-
-  first=true
-  for entry in "${SKILL_ENTRIES[@]}"; do
-    IFS='|' read -r name desc category <<< "$entry"
-
-    if [[ "$first" = true ]]; then
-      first=false
-    else
-      echo ","
-    fi
-
-    printf '    {\n'
-    printf '      "name": "%s",\n' "$name"
-    printf '      "path": "skills/%s",\n' "$name"
-    printf '      "description": "%s",\n' "$desc"
-    printf '      "category": "%s"\n' "$category"
-    printf '    }'
-  done
-
-  echo ""
-  echo "  ]"
-  echo "}"
-} > "$PLUGIN_JSON"
-
 # Generate marketplace.json
 {
   cat << 'EOF'
@@ -144,7 +107,7 @@ EOF
   echo "}"
 } > "$MARKETPLACE_JSON"
 
-echo "✓ Synced ${#SKILL_ENTRIES[@]} skills to plugin.json and marketplace.json"
+echo "✓ Synced ${#SKILL_ENTRIES[@]} skills to marketplace.json"
 
-# Add the files to staging if they changed
-git add "$PLUGIN_JSON" "$MARKETPLACE_JSON" 2>/dev/null || true
+# Add the file to staging if it changed
+git add "$MARKETPLACE_JSON" 2>/dev/null || true
